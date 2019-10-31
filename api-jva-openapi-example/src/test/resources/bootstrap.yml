@@ -1,0 +1,47 @@
+# Boot strap YAML for motor ipt calculator service
+---
+spring:
+  application:
+    name: api-jva-openapi-example
+  main:
+    banner-mode: 'off'
+  servlet:
+    multipart:
+      max-file-size: 1Mb
+      max-request-size: 10Mb
+  boot:
+    admin:
+      client:
+        enabled: false
+       
+
+# Server/service default values.server:
+server:
+  servlet:
+    context-path: /api-jva-openapi-example/v1
+    
+management:
+  server:
+    port: 9091
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  path: /var/log
+  level:
+    root: info
+    com.esure.api: info
+
+application: 
+  name: api-jva-openapi-example
+  version: 1.0
+  description: API service
+  license: License Details
+  licenseUrl: http://www.esure.com/licenses/LICENSE-2.0.html
+  termsOfServiceUrl: http://www.esure.com
+  createdBy: Esure Api Team
+  seeMoreAtApi: https://myesure.atlassian.net/wiki/spaces/NMR/pages/374047139/Motor+IPT+Calculator
+  contactTheDeveloper: api-dev@esure.com
+  

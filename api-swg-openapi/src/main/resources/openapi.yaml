@@ -1,0 +1,171 @@
+openapi: 3.0.0
+info:
+  title: Example OpenAPI REST API specification
+  description: This is the specification for an example service
+  version: "1.0"
+  termsOfService: http://localhost/terms-and-conditions
+  contact:
+    name: API Factory Team
+    url: http://www.esure.com
+    email: api-dev@esure.com
+  license:
+    name: Company Licence
+    url: http://www.esure.com/licenses/LICENSE-2.0.html
+tags:
+  - name: Example OpenAPI specification
+
+servers:
+  - url: http://localhost:9330/v1
+  - url: https://localhost:9330/v1
+
+paths:
+  /example:
+    post:
+      tags:
+        - insert a record
+      summary:  insert request
+      description: insert request
+      externalDocs:
+        description: Example insert technical Reference
+        url: https://myesure.atlassian.net/wiki/spaces/claims
+      operationId: insert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/ClaimRequest'
+                - $ref: '#/components/schemas/SubcaseRequest'
+              discriminator:
+                propertyName: recordType
+                mapping:
+                  CLAIM: '#/components/schemas/ClaimRequest'
+                  SUB_CASE: '#/components/schemas/SubcaseRequest'
+        required: true
+      responses:
+        "200":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExampleResponse"
+        "400":
+          description: Bad Request
+        "500":
+          description: Failure
+
+    get:
+      tags:
+        - Get the record related to the id
+      summary: Search for a record
+      description: search for a record, response may differ
+      externalDocs:
+        description: Example search technical Reference
+        url: https://myesure.atlassian.net/wiki/spaces/claims
+      operationId: search
+      parameters:
+        - name: recordType
+          in: path
+          required: true
+          schema:
+             $ref: "#/components/schemas/RecordType"
+        - name: id
+          in: path
+          description: a reference number
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExampleResponse"
+        "400":
+          description: Bad Request
+        "500":
+          description: Failure
+
+components:
+  schemas:
+    ExampleResponse:
+      type: object
+      allOf:
+        - $ref: ./common.yaml#/ResponseWrapper
+        - properties:
+            results:
+              type: array
+              items:
+                oneOf:
+                  - $ref: "#/components/schemas/ClaimRequest"
+                  - $ref: "#/components/schemas/SubcaseRequest"
+
+    BaseExampleRequest:
+      type: object
+      required:
+        - recordType
+        - id
+      properties:
+        recordType:
+          $ref: "#/components/schemas/RecordType"
+        id:
+          type: integer
+          format: int64
+          maximum: 9999999999
+
+    RecordType:
+      type: string
+      enum:
+        - CLAIM
+        - SUB_CASE
+
+    ClaimRequest:
+      type: object
+      required:
+        - id
+        - recordType
+        - subcases
+      allOf:
+        - $ref: "#/components/schemas/BaseExampleRequest"
+        - properties:
+            policyId:
+              type: integer
+              format: int64
+            subcases:
+              type: array
+              items:
+                $ref: "#/components/schemas/SubcaseObject"
+              minItems: 1
+
+    SubcaseRequest:
+      type: object
+      required:
+        - id
+        - recordType
+        - claimReferenceId
+      allOf:
+        - $ref: "#/components/schemas/BaseExampleRequest"
+        - properties:
+            claimReferenceId:
+              type: integer
+              format: int64
+            openedDate:
+              type: string
+              format: date
+            status:
+              type: string
+
+    SubcaseObject:
+      type: object
+      properties:
+        claimReferenceId:
+          type: integer
+          format: int64
+        openedDate:
+          type: string
+          format: date
+        status:
+          type: string
+          

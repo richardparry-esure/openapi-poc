@@ -1,0 +1,88 @@
+pipeline
+{
+    agent any
+    tools
+    {
+        maven 'Maven'
+        jdk 'Java'
+    }
+    stages
+    {
+        stage ('Slack Notifier')
+        {
+            steps
+            {
+                build 'slack-integration-notifier'
+            }
+        }
+        stage ('Checkout Deployment Scripts from Git')
+        {
+            steps
+            {
+                dir ('depscripts')
+                {
+                    git branch: 'master', credentialsId: 'jenkins-ci-git-ssh', url: 'git@github.com:esure-dev/jenkins-deployment-scripts.git'
+                    echo 'Checkout Deployment Scripts from Git stage done...'
+                }
+            }
+        }
+        stage ('Copy Maven Settings')
+        {
+            steps
+            {
+                sh '$WORKSPACE/depscripts/scripts/copy_swg_mvnsettings.sh "copy_swg_mvnsettings.sh"'
+                echo 'Copy Maven Settings stage done...'
+            }
+        }
+        stage ('Maven Build and Deploy to JFrog')
+        {
+            // For master and development branches, do a full build and deploy to JFrog.
+            when
+            {
+                anyOf
+                {
+                    branch 'master';
+                    branch 'development'
+                }
+            }
+            steps
+            {
+                sh '$WORKSPACE/depscripts/scripts/swg_install.sh "swg_install.sh"'
+                echo 'Maven Build and Deploy to JFrog stage done...'
+            }
+        }
+        stage ('Maven Install if Feature Branch')
+        {
+            // For feature branches, only go as far as the install lifecycle phase to avoid pushing artifacts to JFrog.
+            when
+            {
+                not
+                {
+                    anyOf
+                    {
+                        branch 'master';
+                        branch 'development'
+                    }
+                }
+            }
+            steps
+            {
+                sh 'mvn install -B && ls -la target'
+                echo 'Maven Install if Feature Branch stage done...'
+            }
+        }
+    }
+    post
+    {
+        success
+        {
+            echo 'Result...SUCCESS'
+            build 'slack-integration-notifier'
+        }
+        failure
+        {
+            echo 'Result...FAILED'
+            build 'slack-integration-notifier'
+        }
+    }
+}

@@ -1,0 +1,142 @@
+= {apiDesc}
+v{apiMajorVersion} ({apiVersion}) updated: {buildDate}
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+
+++++
+<script src="../js/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="../css/font-awesome-5.8.0-web.min.css"/>
+<style>
+div#header{
+    max-width:inherit;
+}
+
+div#header h1{
+    text-align: center;
+}
+
+pre{
+	display: inline-block;
+    padding: 9.5px;
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.42857;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+div#content{
+	max-width:inherit;
+}
+
+colgroup col{
+	width:inherit;
+}
+
+table tr:nth-of-type(even) {
+    background: inherit;
+}
+.collapsor{
+    position:absolute;
+}
+.collapsor.fa-minus-square{
+    opacity: .3;
+}
+.collapsor:hover,.collapsor.fa-plus-square{
+    opacity: .5;
+}
+h2 + .collapsor{
+    margin-top: -47px;
+}
+h3 + .collapsor{
+    margin-top: -37px;
+}
+h4 + .collapsor{
+    margin-top: -32px;
+}
+h2,h3,h4{
+    padding-left: 32px;
+}
+h2,h3,h4,.collapsor,table caption{
+    cursor: pointer;
+}
+.sectionbody,.sect3{
+    padding:20px;
+}
+.sect2,.sect3{
+    padding: 10px;
+}
+td pre{
+	min-width:300px;
+    width:400px;
+}
+.collapsor.fa-plus-square + pre {
+    height: 5px;
+    padding: 5px;
+    overflow-y: hidden;
+}
+.collapsor + table caption.title{
+    padding-left:20px;
+    line-height: inherit;
+}
+.collapsor.fa-plus-square + table tbody {
+    display: none;
+}
+</style>
+<script>
+    $(document).ready(function(){
+        var collapsorHtml = '<i class="collapsor fas fa-minus-square"></i>';
+		$('h2,h3,h4').after(collapsorHtml);
+        $('pre,table').before(collapsorHtml);
+		$('h2,h3,h4,.collapsor,table caption').click(function(evt){
+            var $next = $(evt.target).next();
+
+            var evtTgtTagName = $(evt.target).prop('tagName');
+
+            if($next.length>0 && $next.prop('tagName') !== 'TABLE'){
+                var $collapseFrom;
+                if(evtTgtTagName.match('^H[1-4]$')!=null){
+                    $collapseFrom = $(evt.target).next('.collapsor');
+                }else{
+                    $collapseFrom = $(evt.target);
+                }
+                $collapseFrom.nextAll('.sectionbody,.sect3,.sect4,.paragraph,.tableblock,.collapsor').toggle();
+                }
+            var $collapsor = $(evt.target).closest('.collapsor');
+            if($collapsor.length == 0){
+                $collapsor = $(evt.target).nextAll('.collapsor');
+            }
+            if(evtTgtTagName === 'CAPTION'){
+                $collapsor = $(evt.target).parent().prev('.collapsor');
+            }
+            $collapsor.toggleClass('fa-minus-square fa-plus-square');
+    });
+});
+</script>
+++++
+
+== Overview
+This API gets the claims associated with a policy and its version number
+
+== Technologies Used
+* Spring Boot - Server to host the Rest API
+
+
+include::{snippets}/controllers/controllers.adoc[]
+
+== Error Codes
+The service could return the following errors. Each error has a code, description and a message to provide additional information about the error. +
+include::{snippets}/errors/errors.adoc[]
+
+== Interfaces
+include::{snippets}/interfaces/interfaces.adoc[]
+
+== Scenarios
+include::{snippets}/scenarios/scenarios.adoc[]

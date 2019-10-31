@@ -1,0 +1,103 @@
+pipeline
+{
+    agent any
+    tools
+    {
+        maven 'Maven'
+        jdk 'Java'
+    }
+    environment
+    {
+        DEV_ENVIRONMENT="devw"
+        TEST_ENVIRONMENT="tsth"
+    }
+    stages
+    {
+        stage ('Slack Notifier')
+        {
+            steps
+            {
+                build 'slack-integration-notifier'
+            }
+        }
+        stage ('Checkout Deployment Scripts from Git')
+        {
+            steps
+            {
+                dir ('depscripts')
+                {
+                    git branch: 'master', credentialsId: 'jenkins-ci-git-ssh', url: 'git@github.com:esure-dev/jenkins-deployment-scripts.git'
+                    echo 'Checkout Deployment Scripts from Git stage done...'
+                }
+            }
+        }
+        stage ('Copy Maven Settings')
+        {
+            steps
+            {
+                sh '$WORKSPACE/depscripts/scripts/copy_mvnsettings.sh "copy_mvnsettings.sh"'
+                echo 'Copy Maven Settings stage done...'
+            }
+        }
+        stage ('Maven Install')
+        {
+            steps
+            {
+                sh 'mvn install -B && ls -la target'
+                echo 'Maven Install stage done...'
+            }
+        }
+        stage ('SonarQube Analysis')
+        {
+            steps
+            {
+                withSonarQubeEnv('SonarQubeScanner') 
+                {
+                    sh '$WORKSPACE/depscripts/scripts/sonar_analysis.sh "sonar_analysis.sh"'
+                }
+                echo 'SonarQube Analysis stage done...'
+            }
+        }
+        stage ('Deploy to AWS Elastic Beanstalk')
+        {
+            // For master and development branches, do a deployment to AWS Elastic Beanstalk.
+            when
+            {
+                anyOf
+                {
+                    branch 'master';
+                    branch 'development'
+                }
+            }
+            steps
+            {
+                echo 'Docker build starting...'
+                sh '$WORKSPACE/depscripts/scripts/docker_build.sh "docker_build.sh"'
+                echo 'Docker build finished'
+                echo 'Docker deployment starting...'
+                sh '$WORKSPACE/depscripts/scripts/docker_deploy.sh "docker_deploy.sh"'
+                echo 'Docker deployment finished'
+                echo 'AWS Elastic Beanstalk deployment starting...'
+                sh '$WORKSPACE/depscripts/scripts/eb_devdeploy.sh "eb_devdeploy.sh"'
+                echo 'AWS Elastic Beanstalk deployment finished'
+                echo 'Reports deployment starting...'
+                sh '$WORKSPACE/depscripts/scripts/reports_deploy.sh "reports_deploy.sh"'
+                echo 'Reports deployment finished'
+                echo 'Deploy to AWS Elastic Beanstalk stage done...'
+            }
+        }
+    }
+    post
+    {
+        success
+        {
+            echo 'Result...SUCCESS'
+            build 'slack-integration-notifier'
+        }
+        failure
+        {
+            echo 'Result...FAILED'
+            build 'slack-integration-notifier'
+        }
+    }
+}
