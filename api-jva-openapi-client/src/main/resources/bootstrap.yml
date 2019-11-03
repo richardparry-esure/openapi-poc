@@ -1,0 +1,45 @@
+# Boot strap YAML 
+---
+spring:
+  application:
+    name: api-jva-openapi-client
+  cloud:
+    config:
+      enabled: false
+  profiles:
+    active:
+    - local
+  main:
+    banner-mode: 'off'
+  servlet:
+    multipart:
+      max-file-size: 1Mb
+      max-request-size: 10Mb
+        
+
+# Server/service default values.server:
+server:
+  port: 8798
+  servlet:
+    context-path: /api-jva-openapi-client/v1
+    
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  server:
+    port: 8799
+
+logging:
+  path: /var/log
+  level:
+    root: debug
+
+feign:
+  hystrix:
+    enabled: false
+  client:
+    config:
+      openapi-server:
+        loggerLevel: full

@@ -57,7 +57,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateResponse"
+                $ref: "#/components/schemas/Pet"
         default:
           description: unexpected error
           content:
@@ -92,11 +92,6 @@ paths:
                 $ref: "#/components/schemas/Error"
 components:
   schemas:
-    CreateResponse:
-      type: object
-      properties:
-        id:
-          type: string
     Pet:
       type: object
       discriminator:
@@ -105,6 +100,8 @@ components:
           dog: '#/components/schemas/Dog'
           cat: '#/components/schemas/Cat'
       properties:
+        id:
+          type: string
         name:
           type: string
         petType:

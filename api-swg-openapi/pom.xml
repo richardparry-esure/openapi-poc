@@ -1,16 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.esure.api</groupId>
+  <groupId>poc.openapi</groupId>
   <artifactId>api-swg-openapi</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   
   <name>A custom project</name>
-  <licenses>
-    <license>
-      <name>Esure Ltd</name>
-      <url>http://www.esure.com/licenses/LICENSE-2.0</url>
-    </license>
-  </licenses>
 
   <properties>
     <java.version>1.8</java.version>
@@ -18,8 +12,8 @@
     <swagger.codegen.plugin.version>3.0.13</swagger.codegen.plugin.version>
     <!-- <swagger.version>2.9.2</swagger.version> -->
     <swagger.inputSpec>src/main/resources/petstore.yaml</swagger.inputSpec>
-    <swagger.modelPackage>com.esure.api.openapi.swagger.model</swagger.modelPackage>
-    <swagger.apiPackage>com.esure.api.openapi.swagger.api</swagger.apiPackage>
+    <swagger.modelPackage>poc.openapi.swagger.model</swagger.modelPackage>
+    <swagger.apiPackage>poc.openapi.swagger.api</swagger.apiPackage>
     <maven.test.skip>true</maven.test.skip>
   </properties>
 
@@ -78,21 +72,6 @@
     </dependency>
   </dependencies>
   
-  <distributionManagement>
- 
-    <snapshotRepository>
-        <id>snapshots</id>
-        <name>jfrog.escloud-snapshots</name>
-        <url>${env.MAVEN_REPO_URL}${env.MAVEN_LIB_SNPST_REPO}</url>
-    </snapshotRepository>
- 
-    <repository>
-        <id>central</id>
-        <name>jfrog.escloud-releases</name>
-        <url>${env.MAVEN_REPO_URL}${env.MAVEN_LIB_RLSE_REPO}</url>
-    </repository>
-         
-</distributionManagement>
 
   <build>
 
@@ -133,32 +112,7 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      
-      <plugin>
-		  <groupId>org.jfrog.buildinfo</groupId>
-    	  <artifactId>artifactory-maven-plugin</artifactId>
-    	  <version>2.6.1</version>
-    	  <inherited>false</inherited>
-    	  <executions>
-          	  <execution>
-            	  <id>build-info</id>
-            	  <goals>
-                	  <goal>publish</goal>
-            	  </goals>
-            	  <configuration>                          
-                	  <publisher>
-                    	  <contextUrl>${env.MAVEN_REPO_URL}</contextUrl>
-                    	  <username>${env.MVN_REPO_USER}</username>
-                    	  <password>${env.MVN_REPO_PWD}</password>
-                    	  <repoKey>${env.MAVEN_LIB_RLSE_REPO}</repoKey>
-                    	  <snapshotRepoKey>${env.MAVEN_LIB_SNPST_REPO}</snapshotRepoKey>
-                	  </publisher>
-            	  </configuration>
-        	  </execution>
-    	  </executions>
-	  </plugin>
-      
+      </plugin>   
     </plugins>
   </build>
 
